@@ -53,8 +53,7 @@ export class FinderService {
         this.logger.log('Cron job DEACTIVATED (задача остановлена)');
     }
 
-    // @Cron('15 */5 * * * *', { name: 'finderCronJob' })
-    @Cron('*/10 * * * * *', { name: 'finderCronJob' })
+    @Cron('15 */5 * * * *', { name: 'finderCronJob' })
     public async findXPathSpins(requiredSpinsCount: number = 249) {
         const job = this.schedulerRegistry.getCronJob('finderCronJob');
 
