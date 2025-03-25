@@ -27,7 +27,7 @@ export class FinderService {
     }
 
     @Cron('15 */5 * * * *')
-    public async findXPathSpins() {
+    public async findXPathSpins(requiredSpinsCount: number = 249) {
         this.logger.log('Загрузка страницы...');
 
         try {
@@ -53,17 +53,17 @@ export class FinderService {
                 null,
             )
 
-            const finderSpins = +(resultSpins.singleNodeValue)!.textContent!;
-            const finderNumbers = +(resultsNumber.singleNodeValue)!.textContent!;
+            const finderSpins: number = +(resultSpins.singleNodeValue)!.textContent!;
+            const finderNumbers: number = +(resultsNumber.singleNodeValue)!.textContent!;
 
-            if (finderSpins >= 249) {
+            if (finderSpins >= requiredSpinsCount) {
                 this.logger.log(`${await this.getTimeHhMmSs()} - Найдено невыпадов: ${finderSpins} (у числа ${finderNumbers})\nПодробнее - https://daily.heroeswm.ru/roulette/detal.php!!!`);
                 await this.telegramService.sendMessage(
                     this.configService.get('TELEGRAM_CHAT_ID')!,
                     `${await this.getTimeHhMmSs()} - Найдено невыпадов: ${finderSpins} (у числа ${finderNumbers})\nПодробнее - https://daily.heroeswm.ru/roulette/detal.php!!!`,
                 );
             } else {
-                this.logger.warn(`${await this.getTimeHhMmSs()} - Пока рекорд по невыпадениям - ${finderSpins} (у числа ${finderNumbers}), давай ждать момента...`);
+                this.logger.warn(`${await this.getTimeHhMmSs()} - Пока рекорд по невыпадениям - ${finderSpins} (у числа ${finderNumbers}), давай ждать ${requiredSpinsCount} невыпадов...`);
             }
         } catch (error) {
             this.logger.error(`${await this.getTimeHhMmSs()} - Ошибка при загрузке или парсинге страницы:`, error);

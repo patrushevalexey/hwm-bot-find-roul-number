@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
 import { ScheduleModule } from "@nestjs/schedule";
-import { FinderModule } from "./finder/finder.module";
-import { TelegramModule } from "./telegram/telegram.module";
+import { FinderModule } from "./services/finder/finder.module";
+import { TelegramModule } from "./services/telegram/telegram.module";
 
 @Module({
   imports: [
