@@ -2,8 +2,9 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
 import { ScheduleModule } from "@nestjs/schedule";
-import { FinderModule } from "./services/finder/finder.module";
-import { TelegramModule } from "./services/telegram/telegram.module";
+import {FinderApiModule} from "./api/controllers/finder.module";
+import {FinderServiceModule} from "./services/finder/finder.module";
+import {TelegramServiceModule} from "./services/telegram/telegram.module";
 
 @Module({
   imports: [
@@ -12,8 +13,9 @@ import { TelegramModule } from "./services/telegram/telegram.module";
           isGlobal: true,
           envFilePath: '.env',
       }),
-      FinderModule,
-      TelegramModule,
+      FinderApiModule,
+      FinderServiceModule,
+      TelegramServiceModule,
   ],
 })
 export class AppModule {}

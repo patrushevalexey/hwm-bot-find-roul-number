@@ -2,7 +2,7 @@ import axios from 'axios';
 import { JSDOM } from 'jsdom';
 
 import { Injectable, Logger } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
+import { Cron, SchedulerRegistry } from '@nestjs/schedule';
 import { ConfigService } from "@nestjs/config";
 
 import { TelegramService } from "../telegram/telegram.service";
@@ -16,18 +16,53 @@ export class FinderService {
     constructor(
         private readonly telegramService: TelegramService,
         private readonly configService: ConfigService,
+        private readonly schedulerRegistry: SchedulerRegistry,
     ) {}
 
     public async getTimeHhMmSs() {
         const now = new Date();
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        const seconds = String(now.getSeconds()).padStart(2, '0');
+        const hours: string = String(now.getHours()).padStart(2, '0');
+        const minutes: string = String(now.getMinutes()).padStart(2, '0');
+        const seconds: string = String(now.getSeconds()).padStart(2, '0');
         return `${hours}:${minutes}:${seconds}`;
     }
 
-    @Cron('15 */5 * * * *')
+    public activateCron(): void {
+        const job = this.schedulerRegistry.getCronJob('finderCronJob');
+
+        if (job.running) {
+            this.logger.log('Cron job already activated!');
+            this.telegramService.sendMessage(process.env.TELEGRAM_CHAT_ID!, `Бот уже работает!`);
+            return;
+        }
+
+        job.start();
+        this.logger.log('Cron job ACTIVATED (задача будет выполняться)');
+    }
+
+    public deactivateCron(): void {
+        const job = this.schedulerRegistry.getCronJob('finderCronJob');
+
+        if (!job.running) {
+            this.logger.log('Cron job already deactivated!');
+            this.telegramService.sendMessage(process.env.TELEGRAM_CHAT_ID!, `Бот уже выключен!`);
+            return;
+        }
+
+        job.stop();
+        this.logger.log('Cron job DEACTIVATED (задача остановлена)');
+    }
+
+    // @Cron('15 */5 * * * *', { name: 'finderCronJob' })
+    @Cron('*/10 * * * * *', { name: 'finderCronJob' })
     public async findXPathSpins(requiredSpinsCount: number = 249) {
+        const job = this.schedulerRegistry.getCronJob('finderCronJob');
+
+        if (!job.running) {
+            this.logger.log('Cron job is inactive, skipping execution');
+            return;
+        }
+
         this.logger.log('Загрузка страницы...');
 
         try {

@@ -1,11 +1,11 @@
 import { Module } from "@nestjs/common";
 
 import { FinderService } from "./finder.service";
-import { TelegramModule } from "../telegram/telegram.module";
+import { TelegramServiceModule } from "../telegram/telegram.module";
 
 @Module({
-    imports: [TelegramModule],
+    imports: [TelegramServiceModule],
     providers: [FinderService],
     exports: [FinderService]
 })
-export class FinderModule {}
+export class FinderServiceModule {}
